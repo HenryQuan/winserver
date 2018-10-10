@@ -4,6 +4,7 @@ using System.Threading;
 using System.Text;
 using NetFwTypeLib;
 using System.Diagnostics;
+using System.Net.Sockets;
 
 namespace winserver
 {
@@ -14,37 +15,64 @@ namespace winserver
         static void Main(string[] args)
         {
             int port = 8605;
+            string ip = GetIPAddress();
 
             // Add port first for foreign access
             AddPortToFirewall("WoWs Info", port);
 
-            var address = $"http://192.168.1.102:{port}/";
+            var address = $"http://{ip}:{port}/";
             Console.WriteLine("Starting server...");
             // Add the address you want to use
             listener.Prefixes.Add(address);
             listener.Start(); // start server (Run application as Administrator!)
             Console.WriteLine("Server is now online at " + address);
             Process.Start(address);
+            Console.WriteLine("Github: https://github.com/HenryQuan/winserver");
 
             var response = new Thread(ResponseThread);
             response.Start(); // start the response thread
         }
 
+        /// <summary>
+        /// Responce to request
+        /// Reference: https://www.codeproject.com/Tips/485182/Create-a-local-server-in-Csharp
+        /// </summary>
         static void ResponseThread()
         {
+            var rand = new Random();
+            int count = 0;
             while (true)
             {
                 var context = listener.GetContext();
-                byte[] responseArray = Encoding.UTF8.GetBytes("Hello World From C#"); // get the bytes to response
+                byte[] responseArray = Encoding.UTF8.GetBytes($"Hello World from C#\nYour lucky number is {rand.Next(888888)}"); // get the bytes to response
                 context.Response.OutputStream.Write(responseArray, 0, responseArray.Length); // write bytes to the output stream
                 context.Response.KeepAlive = false; // set the KeepAlive bool to false
                 context.Response.Close(); // close the connection
-                Console.WriteLine("200 OK");
             }
         }
 
         /// <summary>
+        /// Get your local ip address
+        /// Reference: https://stackoverflow.com/questions/6803073/get-local-ip-address
+        /// </summary>
+        /// <returns>local ip</returns>
+        static string GetIPAddress()
+        {
+            string localIP;
+            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
+            {
+                // It does not have to be valid since there is no real connection
+                socket.Connect("8.8.8.8", 65530);
+                // This gives the local address that would be used to connect to the specified remote host
+                IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint;
+                localIP = endPoint.Address.ToString();
+            }
+            return localIP;
+        }
+
+        /// <summary>
         /// Add port to windows firewall
+        /// Reference: https://social.msdn.microsoft.com/Forums/vstudio/en-US/a3e390d1-4383-4f23-bad9-b725bef33499/add-firewall-rule-programatically?forum=wcf
         /// </summary>
         static void AddPortToFirewall(string name, int port)
         {
