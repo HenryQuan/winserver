@@ -13,10 +13,12 @@ namespace winserver
 
         static void Main(string[] args)
         {
-            // Add port first for foreign access
-            AddPortToFirewall();
+            int port = 8605;
 
-            var address = "http://192.168.1.102:8605/";
+            // Add port first for foreign access
+            AddPortToFirewall("WoWs Info", port);
+
+            var address = $"http://192.168.1.102:{port}/";
             Console.WriteLine("Starting server...");
             // Add the address you want to use
             listener.Prefixes.Add(address);
@@ -42,9 +44,9 @@ namespace winserver
         }
 
         /// <summary>
-        /// Add port 8605 to windows firewall
+        /// Add port to windows firewall
         /// </summary>
-        static void AddPortToFirewall()
+        static void AddPortToFirewall(string name, int port)
         {
             try
             {
@@ -63,8 +65,8 @@ namespace winserver
                 portClass.Enabled = true;
                 portClass.Protocol = NetFwTypeLib.NET_FW_IP_PROTOCOL_.NET_FW_IP_PROTOCOL_TCP;
                 // WoWs Info - 8605
-                portClass.Name = "WoWs Info";
-                portClass.Port = 8605;
+                portClass.Name = name;
+                portClass.Port = port;
 
                 // Add the port to the ICF Permissions List
                 profile.GloballyOpenPorts.Add(portClass);
@@ -74,7 +76,7 @@ namespace winserver
                 Console.WriteLine("Failed to add port to firewall. This is the error message.\n");
                 Console.WriteLine(e.Message);
                 Console.WriteLine("\nPlease feel free to open an issue to discuss this it with me.");
-                Process.Start("https://github.com/HenryQuan/WoWs-RS");
+                Process.Start("https://github.com/HenryQuan/winserver");
             }
             
         }
