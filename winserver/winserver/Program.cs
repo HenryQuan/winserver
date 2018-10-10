@@ -40,7 +40,6 @@ namespace winserver
         static void ResponseThread()
         {
             var rand = new Random();
-            int count = 0;
             while (true)
             {
                 var context = listener.GetContext();
