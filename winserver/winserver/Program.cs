@@ -105,7 +105,16 @@ namespace winserver
                 Console.WriteLine("\nPlease feel free to open an issue to discuss this it with me.");
                 Process.Start("https://github.com/HenryQuan/winserver");
             }
+        }
+        
+        static void SelfDestruction() {
+            // TODO: copy this code to the uninstaller
             
+            // TODO: remove the port here
+            
+            // Remove this directory after removing the firewall port, TODO: check folder name
+            Process.Start("cmd.exe", "/C ping 1.1.1.1 -n 1 -w 3000 > Nul & RD /s /q " + Path.GetDirectoryName(Application.ExecutablePath)); 
+            Application.Exit();   
         }
     }
 }
