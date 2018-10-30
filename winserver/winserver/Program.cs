@@ -5,6 +5,7 @@ using System.Text;
 using NetFwTypeLib;
 using System.Diagnostics;
 using System.Net.Sockets;
+using System.IO;
 
 namespace winserver
 {
@@ -43,8 +44,16 @@ namespace winserver
             while (true)
             {
                 var context = listener.GetContext();
-                byte[] responseArray = Encoding.UTF8.GetBytes($"Hello World from C#\nYour lucky number is {rand.Next(888888)}"); // get the bytes to response
-                context.Response.OutputStream.Write(responseArray, 0, responseArray.Length); // write bytes to the output stream
+
+                var ARENA = @"G:\World_of_Warships\replays\tempArenaInfo.json";
+                // Grab the file we want and send it
+                if (File.Exists(ARENA))
+                {
+                    // Get this file and send it as bytes
+                    var json = File.ReadAllText(ARENA);
+                    byte[] responseArray = Encoding.UTF8.GetBytes(json); // get the bytes to response
+                    context.Response.OutputStream.Write(responseArray, 0, responseArray.Length); // write bytes to the output stream
+                }
                 context.Response.KeepAlive = false; // set the KeepAlive bool to false
                 context.Response.Close(); // close the connection
             }
