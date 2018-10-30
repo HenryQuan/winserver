@@ -12,6 +12,7 @@ namespace winserver
     class Program
     {
         static HttpListener listener = new HttpListener();
+        static string lastEdited = "";
 
         static void Main(string[] args)
         {
@@ -46,14 +47,21 @@ namespace winserver
                 var context = listener.GetContext();
 
                 var ARENA = @"G:\World_of_Warships\replays\tempArenaInfo.json";
+                string json = "[]";
                 // Grab the file we want and send it
                 if (File.Exists(ARENA))
                 {
-                    // Get this file and send it as bytes
-                    var json = File.ReadAllText(ARENA);
-                    byte[] responseArray = Encoding.UTF8.GetBytes(json); // get the bytes to response
-                    context.Response.OutputStream.Write(responseArray, 0, responseArray.Length); // write bytes to the output stream
+                    var curr = File.GetLastWriteTime(ARENA).ToString();
+
+                    if (lastEdited == "" || lastEdited != curr)
+                    {
+                        lastEdited = curr;
+                        // Get this file and send it as bytes
+                        json = File.ReadAllText(ARENA);
+                    }
                 }
+                byte[] responseArray = Encoding.UTF8.GetBytes(json); // get the bytes to response
+                context.Response.OutputStream.Write(responseArray, 0, responseArray.Length); // write bytes to the output stream
                 context.Response.KeepAlive = false; // set the KeepAlive bool to false
                 context.Response.Close(); // close the connection
             }
