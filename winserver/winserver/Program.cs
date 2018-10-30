@@ -44,6 +44,7 @@ namespace winserver
             var rand = new Random();
             while (true)
             {
+                Console.WriteLine("Request received");
                 var context = listener.GetContext();
 
                 var ARENA = @"G:\World_of_Warships\replays\tempArenaInfo.json";
@@ -55,6 +56,7 @@ namespace winserver
 
                     if (lastEdited == "" || lastEdited != curr)
                     {
+                        Console.WriteLine("Update detected");
                         lastEdited = curr;
                         // Get this file and send it as bytes
                         json = File.ReadAllText(ARENA);
