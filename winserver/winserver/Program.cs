@@ -28,7 +28,7 @@ namespace winserver
             listener.Prefixes.Add(address);
             listener.Start(); // start server (Run application as Administrator!)
             Console.WriteLine("Server is now online at " + address);
-            Process.Start(address);
+            // Process.Start(address);
             Console.WriteLine("Github: https://github.com/HenryQuan/winserver");
 
             var response = new Thread(ResponseThread);
