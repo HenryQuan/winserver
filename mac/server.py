@@ -1,5 +1,6 @@
 from socket import *
 import webbrowser
+import random
 
 # from https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
 s = socket(AF_INET, SOCK_DGRAM)
@@ -23,9 +24,14 @@ while True:
     response = client.recv(1024)
 
     # header + data to be sent
-    data = b'Hello World'
+    data = b'[]'
     header = b'HTTP/1.0 200 OK\n'
     content_type = b'Content-Type: text/html\n\n'
+
+    # 30% chance when it will sends []
+    num = random.randint(0, 10)
+    if (num > 2):
+      data = open('tempArenaInfo.json', 'rb').read()
 
     # send eader
     client.send(header)

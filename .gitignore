@@ -330,4 +330,4 @@ ASALocalRun/
 .mfractor/
 
 # Testing files
-tempArenaInfo.json
+mac/tempArenaInfo.json
