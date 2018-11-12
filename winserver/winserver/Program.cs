@@ -90,6 +90,7 @@ namespace winserver
                 {
                     // Record this line to add our script later
                     scriptLine = i;
+                    break;
                 }
             }
 
