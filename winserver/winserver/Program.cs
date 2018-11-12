@@ -114,7 +114,7 @@ namespace winserver
                 Console.WriteLine("Request received");
                 var context = listener.GetContext();
 
-                var ARENA = gamePath + @"\tempArenaInfo.json";
+                var ARENA = gamePath + @"\replays\tempArenaInfo.json";
                 string json = "[]";
                 // Grab the file we want and send it
                 if (File.Exists(ARENA))
