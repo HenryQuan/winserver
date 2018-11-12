@@ -13,26 +13,51 @@ namespace winserver
     {
         static HttpListener listener = new HttpListener();
         static string lastEdited = "";
+        static int battle = 0;
 
         static void Main(string[] args)
         {
+            Console.WriteLine("Github: https://github.com/HenryQuan/winserver");
             int port = 8605;
             string ip = GetIPAddress();
+
+            // Deal with game path
+            ValidatePath();
 
             // Add port first for foreign access
             AddPortToFirewall("WoWs Info", port);
 
             var address = $"http://{ip}:{port}/";
-            Console.WriteLine("Starting server...");
             // Add the address you want to use
             listener.Prefixes.Add(address);
             listener.Start(); // start server (Run application as Administrator!)
-            Console.WriteLine("Server is now online at " + address);
+            Console.WriteLine("IP Address -> " + ip);
             // Process.Start(address);
-            Console.WriteLine("Github: https://github.com/HenryQuan/winserver");
 
             var response = new Thread(ResponseThread);
             response.Start(); // start the response thread
+        }
+
+        /// <summary>
+        /// Valid game path and always ask user to add it if not valid
+        /// </summary>
+        static void ValidatePath()
+        {
+            // Check if we have a game path
+            var gamePath = Properties.Settings.Default.path;
+            Console.WriteLine("-> " + gamePath);
+            if (gamePath == "")
+            {
+                var path = "";
+                while (!File.Exists(path + @"\WorldOfWarships.exe"))
+                {
+                    Console.Write("Paste your game path here: ");
+                    path = Console.ReadLine();
+                }
+                // Update path
+                Properties.Settings.Default.path = path;
+                Properties.Settings.Default.Save();
+            }
         }
 
         /// <summary>
@@ -47,7 +72,7 @@ namespace winserver
                 Console.WriteLine("Request received");
                 var context = listener.GetContext();
 
-                var ARENA = @"G:\World_of_Warships\replays\tempArenaInfo.json";
+                var ARENA = Properties.Settings.Default.path + @"\tempArenaInfo.json";
                 string json = "[]";
                 // Grab the file we want and send it
                 if (File.Exists(ARENA))
@@ -56,7 +81,14 @@ namespace winserver
 
                     if (lastEdited == "" || lastEdited != curr)
                     {
-                        Console.WriteLine("Update detected");
+                        battle++;
+                        Console.WriteLine("Battle " + battle);
+                        // Remind user to get a break if played fo too long
+                        if (battle % 6 == 0)
+                        {
+                            Console.WriteLine("Maybe it is time to take a break");
+                        }
+
                         lastEdited = curr;
                         // Get this file and send it as bytes
                         json = File.ReadAllText(ARENA);
