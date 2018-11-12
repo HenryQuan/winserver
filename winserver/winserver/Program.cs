@@ -12,17 +12,22 @@ namespace winserver
     class Program
     {
         static HttpListener listener = new HttpListener();
+
         static string lastEdited = "";
+        static string gamePath = "";
         static int battle = 0;
 
         static void Main(string[] args)
         {
             Console.WriteLine("Github: https://github.com/HenryQuan/winserver");
-            int port = 8605;
-            string ip = GetIPAddress();
 
             // Deal with game path
             ValidatePath();
+            // Make sure replay is on
+            EnableReplay();
+
+            int port = 8605;
+            string ip = GetIPAddress();
 
             // Add port first for foreign access
             AddPortToFirewall("WoWs Info", port);
@@ -44,7 +49,7 @@ namespace winserver
         static void ValidatePath()
         {
             // Check if we have a game path
-            var gamePath = Properties.Settings.Default.path;
+            gamePath = Properties.Settings.Default.path;
             Console.WriteLine("-> " + gamePath);
             if (gamePath == "")
             {
@@ -55,8 +60,44 @@ namespace winserver
                     path = Console.ReadLine();
                 }
                 // Update path
+                gamePath = path;
                 Properties.Settings.Default.path = path;
                 Properties.Settings.Default.Save();
+            }
+        }
+
+        /// <summary>
+        /// Check if replay is enabled and enable it if not
+        /// </summary>
+        static void EnableReplay()
+        {
+            string path = gamePath + @"\preferences.xml";
+            var replay = false;
+            var scriptLine = 0;
+
+            // XmlDocument is so bad... I have to change it manually
+            var xml = File.ReadAllLines(path);
+            for (var i = 0; i < xml.Length; i++)
+            {
+                var line = xml[i];
+                if (line.Contains("<isReplayEnabled>"))
+                {
+                    // Replay is enabled
+                    replay = true;
+                    break;
+                }
+                else if (line.Contains("</scriptsPreferences>"))
+                {
+                    // Record this line to add our script later
+                    scriptLine = i;
+                }
+            }
+
+            if (!replay)
+            {
+                // Enable replay
+                xml[scriptLine] = "		<isReplayEnabled>	true	</isReplayEnabled>\n" + xml[scriptLine];
+                File.WriteAllLines(path, xml);
             }
         }
 
@@ -72,7 +113,7 @@ namespace winserver
                 Console.WriteLine("Request received");
                 var context = listener.GetContext();
 
-                var ARENA = Properties.Settings.Default.path + @"\tempArenaInfo.json";
+                var ARENA = gamePath + @"\tempArenaInfo.json";
                 string json = "[]";
                 // Grab the file we want and send it
                 if (File.Exists(ARENA))
