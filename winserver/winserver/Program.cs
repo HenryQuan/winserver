@@ -37,7 +37,8 @@ namespace winserver
             listener.Prefixes.Add(address);
             listener.Start(); // start server (Run application as Administrator!)
             Console.WriteLine("IP Address -> " + ip);
-            // Process.Start(address);
+            // Start the game
+            Process.Start(gamePath + @"\WorldOfWarships.exe");
 
             var response = new Thread(ResponseThread);
             response.Start(); // start the response thread
