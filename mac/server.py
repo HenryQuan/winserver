@@ -28,12 +28,7 @@ while True:
     header = b'HTTP/1.0 200 OK\n'
     content_type = b'Content-Type: text/html\n\n'
 
-    # 30% chance when it will sends []
-    num = random.randint(0, 10)
-    if (num > 2):
-      data = open('tempArenaInfo.json', 'rb').read()
-      print('Empty data sent')
-
+    data = open('tempArenaInfo.json', 'rb').read()
     # send eader
     client.send(header)
     client.send(content_type)
