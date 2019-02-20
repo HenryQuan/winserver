@@ -32,6 +32,7 @@ while True:
     num = random.randint(0, 10)
     if (num > 2):
       data = open('tempArenaInfo.json', 'rb').read()
+      print('Empty data sent')
 
     # send eader
     client.send(header)
