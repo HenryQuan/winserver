@@ -20,7 +20,7 @@ namespace winserver
             // Add port first for foreign access
             AddPortToFirewall("WoWs Info", port);
 
-            var address = $"http://{ip}:{port}/";
+            var address = $"http://localhost:{port}/";
             Console.WriteLine("Starting server...");
             // Add the address you want to use
             listener.Prefixes.Add(address);
@@ -43,10 +43,13 @@ namespace winserver
             while (true)
             {
                 var context = listener.GetContext();
-                byte[] responseArray = Encoding.UTF8.GetBytes($"Hello World from C#\nYour lucky number is {rand.Next(888888)}"); // get the bytes to response
-                context.Response.OutputStream.Write(responseArray, 0, responseArray.Length); // write bytes to the output stream
-                context.Response.KeepAlive = false; // set the KeepAlive bool to false
-                context.Response.Close(); // close the connection
+                byte[] buffer = Encoding.UTF8.GetBytes($"Hello World from C#\nYour lucky number is {rand.Next(888888)}"); // get the bytes to response
+                var response = context.Response;
+                response.ContentLength64 = buffer.Length;
+                response.KeepAlive = false; // set the KeepAlive bool to false
+                var output = response.OutputStream;
+                output.Write(buffer, 0, buffer.Length); // write bytes to the output stream
+                output.Close();
             }
         }
 
@@ -88,9 +91,9 @@ namespace winserver
                 INetFwProfile profile = icfMgr.LocalPolicy.CurrentProfile;
 
                 // Set the port properties
-                portClass.Scope = NetFwTypeLib.NET_FW_SCOPE_.NET_FW_SCOPE_ALL;
+                portClass.Scope = NET_FW_SCOPE_.NET_FW_SCOPE_ALL;
                 portClass.Enabled = true;
-                portClass.Protocol = NetFwTypeLib.NET_FW_IP_PROTOCOL_.NET_FW_IP_PROTOCOL_TCP;
+                portClass.Protocol = NET_FW_IP_PROTOCOL_.NET_FW_IP_PROTOCOL_TCP;
                 // WoWs Info - 8605
                 portClass.Name = name;
                 portClass.Port = port;
