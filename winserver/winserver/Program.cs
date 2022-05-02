@@ -20,14 +20,16 @@ namespace winserver
             // Add port first for foreign access
             AddPortToFirewall("WoWs Info", port);
 
-            var address = $"http://localhost:{port}/";
+            var address = $"http://+:{port}/";
+
             Console.WriteLine("Starting server...");
             // Add the address you want to use
             listener.Prefixes.Add(address);
+            listener.Prefixes.Add($"http://*:{port}/");
             listener.Start(); // start server (Run application as Administrator!)
             Console.WriteLine("Server is now online at " + address);
             Process.Start(new ProcessStartInfo {
-                FileName = address,
+                FileName = $"http://{ip}:{port}/",
                 UseShellExecute = true
             });
             Console.WriteLine("Github: https://github.com/HenryQuan/winserver");
@@ -104,6 +106,13 @@ namespace winserver
 
                 // Add the port to the ICF Permissions List
                 profile.GloballyOpenPorts.Add(portClass);
+
+                Process p1 = new Process();
+                p1.StartInfo.FileName = "netsh.exe";
+                p1.StartInfo.Arguments = $"http add urlacl url = http://+:{port}/ user=DOMAIN\\user";
+                p1.StartInfo.UseShellExecute = false;
+                p1.StartInfo.RedirectStandardOutput = true;
+                p1.Start();
             }
             catch (Exception e)
             {
