@@ -1,10 +1,10 @@
-﻿using System.Net;
-using System;
-using System.Threading;
-using System.Text;
-using NetFwTypeLib;
+﻿using System;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
+using System.Text;
+using System.Threading;
+using NetFwTypeLib;
 
 namespace winserver
 {
@@ -26,12 +26,16 @@ namespace winserver
             listener.Prefixes.Add(address);
             listener.Start(); // start server (Run application as Administrator!)
             Console.WriteLine("Server is now online at " + address);
-            Process.Start(address);
+            Process.Start(new ProcessStartInfo {
+                FileName = address,
+                UseShellExecute = true
+            });
             Console.WriteLine("Github: https://github.com/HenryQuan/winserver");
 
             var response = new Thread(ResponseThread);
             response.Start(); // start the response thread
         }
+
 
         /// <summary>
         /// Responce to request
@@ -105,10 +109,7 @@ namespace winserver
             {
                 Console.WriteLine("Failed to add port to firewall. This is the error message.\n");
                 Console.WriteLine(e.Message);
-                Console.WriteLine("\nPlease feel free to open an issue to discuss this it with me.");
-                Process.Start("https://github.com/HenryQuan/winserver");
             }
-            
         }
     }
 }
